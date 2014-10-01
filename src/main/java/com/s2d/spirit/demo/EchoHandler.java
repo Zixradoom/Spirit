@@ -1,4 +1,4 @@
-package com.s2d.spirit.test;
+package com.s2d.spirit.demo;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

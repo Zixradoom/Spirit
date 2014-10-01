@@ -1,4 +1,4 @@
-package com.s2d.spirit.test;
+package com.s2d.spirit.demo;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
