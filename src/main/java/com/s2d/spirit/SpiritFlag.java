@@ -1,6 +1,6 @@
 package com.s2d.spirit;
 
-enum SpiritFlag
+public enum SpiritFlag
 {
 	STRING ( ( short ) 0x2 ),
 	PING   ( ( short ) 0x4 ),
