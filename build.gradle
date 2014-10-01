@@ -19,6 +19,7 @@ dependencies {
   runtime files( System.getProperty("user.home") + "/javalib/Cognition-1.0.jar" );
 }
 
+targetCompatibility = 1.8
 sourceCompatibility = 1.8
 version = '1.0'
 
