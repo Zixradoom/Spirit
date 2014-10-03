@@ -1,9 +1,15 @@
 package com.s2d.spirit.udp;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
@@ -62,8 +68,8 @@ public final class MulticastClient implements AutoCloseable
   {
     if ( data != null )
     {
-      Arrays.copyOf ( data, data.length );
-      this.send ( EnumSet.noneOf ( SpiritFlag.class ), data );
+      byte[] copy = Arrays.copyOf ( data, data.length );
+      this.send ( EnumSet.noneOf ( SpiritFlag.class ), copy );
     }
   }
 
@@ -88,7 +94,27 @@ public final class MulticastClient implements AutoCloseable
 
   private void send ( Set < SpiritFlag > flags, byte[] data )
   {
+    try ( ByteArrayOutputStream baos = new ByteArrayOutputStream (); 
+        DataOutputStream dos = new DataOutputStream ( new BufferedOutputStream ( baos ) ) )
+    {
+      dos.writeLong ( 1L ); // magic number
+      
+      int fields = 0x0;
+      for ( SpiritFlag f : flags )
+        fields = fields | f.getFlagValue ();
 
+      dos.writeShort ( 0x0000FFFF & fields ); // flags
+      dos.writeInt ( data.length );
+      dos.write ( data );
+      dos.flush ();
+      byte[] message = baos.toByteArray ();
+      sender.send ( new DatagramPacket ( message, message.length, this.getInetSocketAddress () ) );
+    }
+    catch ( IOException e )
+    {
+      LOGGER.catching ( e );
+      throw LOGGER.throwing ( new RuntimeException ( e ) );
+    }
   }
 
   /**
@@ -107,7 +133,7 @@ public final class MulticastClient implements AutoCloseable
     if ( listener != null )
       listeners.add ( listener );
   }
-  
+
   public InetSocketAddress getInetSocketAddress ()
   {
     return address;
@@ -122,14 +148,44 @@ public final class MulticastClient implements AutoCloseable
   {
     for ( MulticastClientListener mcl : listeners )
       mcl.onException ( this, t );
-    
+
     this.close ();
   }
 
   protected void onRecive ( DatagramPacket packet )
   {
+    try ( DataInputStream dis = new DataInputStream ( new ByteArrayInputStream ( packet.getData () ) ) )
+    {
+      dis.readLong (); // magic number
+      short flags = dis.readShort ();
+      int dataLength = dis.readInt ();
+      byte[] data = new byte[ dataLength ];
+      dis.read ( data );
+      
+      if ( ( flags & SpiritFlag.STRING.getFlagValue () ) > 0 )
+        this.onString ( packet.getAddress (), new String ( data, "UTF-8" ) );
+      else
+        this.onBin ( packet.getAddress (), data );
+    }
+    catch ( IOException e )
+    {
+      LOGGER.catching ( e );
+      this.onException ( e );
+    }
+  }
+  
+  private void onString ( InetAddress remote, String message )
+  {
+    for ( MulticastClientListener mcl : listeners )
+      mcl.onMessage ( this, remote, message );
   }
 
+  private void onBin ( InetAddress remote, byte[] message )
+  {
+    for ( MulticastClientListener mcl : listeners )
+      mcl.onMessage ( this, remote, Arrays.copyOf ( message, message.length ) );
+  }
+  
   private static final class Listener implements Runnable, AutoCloseable
   {
     private final MulticastClient client;
