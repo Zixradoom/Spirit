@@ -51,7 +51,6 @@ public final class MulticastDemo implements MulticastClientListener
 
   public static void main ( String[] args )
   {
-    
     MulticastDemo md = new MulticastDemo ( new InetSocketAddress ( "239.255.1.1", 56781 ) );
   }
   
@@ -60,7 +59,8 @@ public final class MulticastDemo implements MulticastClientListener
     private final MulticastClient client;
     
     private int count = 0;
-    private int max = 5;
+    private int max = 4;
+    private boolean flip = true;
     
     public MulticastClientTask ( MulticastClient client )
     {
@@ -70,9 +70,14 @@ public final class MulticastDemo implements MulticastClientListener
     @Override
     public void run ()
     {
-      client.send ( "Hello World!!" );
+      if ( flip )
+        client.send ( "Hello World!!" );
+      else
+        client.send ( new byte[] { ( byte ) 0xCA, ( byte ) 0xFE } );
       
-      if ( count > max )
+      flip = !flip;
+      
+      if ( count >= max )
       {
         this.cancel ();
         client.close ();
