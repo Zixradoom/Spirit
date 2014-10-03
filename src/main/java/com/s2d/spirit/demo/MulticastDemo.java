@@ -1,4 +1,4 @@
-package com.s2d.spirit.udp.demo;
+package com.s2d.spirit.demo;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
