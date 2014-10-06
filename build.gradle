@@ -23,12 +23,5 @@ targetCompatibility = 1.8
 sourceCompatibility = 1.8
 version = '1.0'
 
-/*
-jar {
-  manifest {
-    attributes 'Main-Class': 'com.s2d.test.HelloWorld'
-  }
-}
-*/
 
 javadoc.options.links("http://docs.oracle.com/javase/7/docs/api/")
