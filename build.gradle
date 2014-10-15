@@ -9,19 +9,28 @@ task wrapper(type: Wrapper) {
 
 repositories {
   mavenCentral()
+  flatDir {
+    name "local"
+    dirs "${System.getProperty( 'user.home' )}/javalib"
+  }
 }
 
 dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.+'
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.0.2'
   compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0.2'
-  compile files( System.getProperty("user.home") + "/javalib/Cognition-1.0.jar" );
-  runtime files( System.getProperty("user.home") + "/javalib/Cognition-1.0.jar" );
+  compile name: "Cognition-1.0"
+  runtime name: "Cognition-1.0"
 }
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
-version = '1.0'
+version = '1.0.0.1'
 
+uploadArchives {
+  repositories {
+    add project.repositories.local
+  }
+}
 
 javadoc.options.links("http://docs.oracle.com/javase/7/docs/api/")
