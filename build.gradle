@@ -1,17 +1,26 @@
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
+apply plugin: 'maven'
 
-// gradle wrapper task
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
+version = '1.0.0.1'
+group = 'com.s2d'
+mainClassName = 'com.s2d.spirit.demo.MulticastDemo'
+
 task wrapper(type: Wrapper) {
   gradleVersion = '1.4'
 }
 
 repositories {
-  mavenCentral()
-  flatDir {
-    name "local"
-    dirs "${System.getProperty( 'user.home' )}/javalib"
+  maven {
+    credentials {
+      username mavenUser
+      password mavenPassword
+    }
+    url "https://www.simonsoftwaredesign.info:8082/nexus/content/groups/public"
   }
 }
 
@@ -19,17 +28,19 @@ dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.0.2'
   compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0.2'
-  compile name: "Cognition-1.0"
-  runtime name: "Cognition-1.0"
+  compile group: 'com.s2d', name: 'Cognition', version: '1.0.0.2'
 }
-
-targetCompatibility = 1.8
-sourceCompatibility = 1.8
-version = '1.0.0.1'
 
 uploadArchives {
   repositories {
-    add project.repositories.local
+    mavenDeployer {
+      repository(url: "https://www.simonsoftwaredesign.info:8082/nexus/content/repositories/releases") {
+        authentication(userName: mavenUser, password: mavenPassword)
+      }
+      snapshotRepository(url: "https://www.simonsoftwaredesign.info:8082/nexus/content/repositories/snapshots") {
+        authentication(userName: mavenUser, password: mavenPassword)
+      }
+    }
   }
 }
 
