@@ -48,6 +48,12 @@ public final class MulticastDemo implements MulticastClientListener
   {
     LOGGER.info ( "Recieved message from [{}][{}]", remote, SpiritUtils.byteArrayToString ( message ) );
   }
+  
+  @Override
+  public void onClose ( MulticastClient multicastClient )
+  {
+    LOGGER.info ( "Client has closed" );
+  }
 
   public static void main ( String[] args )
   {
