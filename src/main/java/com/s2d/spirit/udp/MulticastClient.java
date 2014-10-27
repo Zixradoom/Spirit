@@ -26,6 +26,13 @@ import com.s2d.spirit.SpiritFlag;
 import com.s2d.spirit.exception.SpiritException;
 import com.s2d.spirit.udp.event.MulticastClientListener;
 
+/**
+ * A Multicast end point used to send and receive messages
+ * on the specified port and Multicase group.
+ * 
+ * @author Anthony J Simon
+ *
+ */
 public final class MulticastClient implements AutoCloseable
 {
   static final Logger LOGGER = LogManager.getLogger ( MulticastClient.class );
@@ -113,7 +120,8 @@ public final class MulticastClient implements AutoCloseable
   }
 
   /**
-   * Close this network endpoint
+   * Close this network end point. This will close the underlying
+   * sockets and also notify listeners assigned to this client.
    */
   @Override
   public void close ()
@@ -130,12 +138,29 @@ public final class MulticastClient implements AutoCloseable
     }
   }
 
+  /**
+   * Add a listener to this client
+   * @param listener - the listener to add
+   */
   public void addListener ( MulticastClientListener listener )
   {
     if ( listener != null )
       listeners.add ( listener );
   }
 
+  /**
+   * Remove the specified listener from this client
+   * @param listener - the listener to be removed
+   */
+  public void removeListener ( MulticastClientListener listener )
+  {
+    listeners.remove ( listener );
+  }
+  
+  /**
+   * Get the Socket Address of this endpoint
+   * @return
+   */
   public InetSocketAddress getInetSocketAddress ()
   {
     return address;
