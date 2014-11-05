@@ -6,7 +6,7 @@ apply plugin: 'maven'
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
-version = '1.0.0.2'
+version = '1.0.0.3'
 group = 'com.s2d'
 mainClassName = 'com.s2d.spirit.demo.MulticastDemo'
 
@@ -28,7 +28,24 @@ dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.0.2'
   compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.0.2'
-  compile group: 'com.s2d', name: 'Cognition', version: '1.0.0.2'
+  compile group: 'com.s2d', name: 'Cognition', version: '1.0.0.5'
+}
+
+javadoc.options.links("http://docs.oracle.com/javase/7/docs/api/")
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives sourcesJar
+  archives javadocJar
 }
 
 uploadArchives {
@@ -43,5 +60,3 @@ uploadArchives {
     }
   }
 }
-
-javadoc.options.links("http://docs.oracle.com/javase/7/docs/api/")
