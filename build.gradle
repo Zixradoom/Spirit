@@ -6,7 +6,7 @@ apply plugin: 'maven'
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
-version = '1.0.1.0'
+version = '1.0.2-SNAPSHOT'
 group = 'com.s2d'
 mainClassName = 'com.s2d.spirit.demo.MulticastDemo'
 
